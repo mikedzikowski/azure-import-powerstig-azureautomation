@@ -1,0 +1,120 @@
+{
+  "$schema": "http://schemas.microsoft.org/azure/deploymentTemplate?api-version=2015-01-01#",
+  "contentVersion": "1.0",
+  "parameters": {
+    "New or existing Automation account": {
+      "type": "string",
+      "allowedValues": [
+        "New",
+        "Existing"
+      ],
+      "metadata": {
+        "description": "Select whether you want to create a new Automation account or use an existing account. WARNING: if you select NEW but use an Automation account name that already exists in your subscription, you will not be notified that your account is being updated. The pricing tier for the account will be set to free and any tags on the account will be erased."
+      }
+    },
+    "Automation Account Name": {
+      "type": "string",
+      "metadata": {
+        "description": "The module will be imported to this Automation account. If you want to import your module to an existing account, make sure the resource group matches and you have entered the correct name. The account name must be between 6 to 50 characters, and can contain only letters, numbers, and hyphens."
+      }
+    },
+    "Automation Account Location": {
+      "type": "string",
+      "metadata": {
+        "description": "The location to deploy the Automation account in. If you select an existing account, the location field will not be used."
+      }
+    }
+  },
+  "variables": {
+    "templatelink": "[concat('https://devopsgallerystorage.blob.core.windows.net/armtemplates/PowerSTIG/3.3.0/', parameters('New or existing Automation account'), 'AccountTemplate.json')]",
+    "Level1": {
+      "Modules": [
+        {
+          "Name": "AuditPolicyDsc",
+          "Uri": "https://devopsgallerystorage.blob.core.windows.net:443/packages/auditpolicydsc.1.2.0.nupkg"
+        },
+        {
+          "Name": "AuditSystemDsc",
+          "Uri": "https://devopsgallerystorage.blob.core.windows.net:443/packages/auditsystemdsc.1.0.0.nupkg"
+        },
+        {
+          "Name": "AccessControlDSC",
+          "Uri": "https://devopsgallerystorage.blob.core.windows.net:443/packages/accesscontroldsc.1.4.0.nupkg"
+        },
+        {
+          "Name": "ComputerManagementDsc",
+          "Uri": "https://devopsgallerystorage.blob.core.windows.net:443/packages/computermanagementdsc.6.2.0.nupkg"
+        },
+        {
+          "Name": "FileContentDsc",
+          "Uri": "https://devopsgallerystorage.blob.core.windows.net:443/packages/filecontentdsc.1.1.0.108.nupkg"
+        },
+        {
+          "Name": "PolicyFileEditor",
+          "Uri": "https://devopsgallerystorage.blob.core.windows.net:443/packages/policyfileeditor.3.0.1.nupkg"
+        },
+        {
+          "Name": "PSDscResources",
+          "Uri": "https://devopsgallerystorage.blob.core.windows.net:443/packages/psdscresources.2.10.0.nupkg"
+        },
+        {
+          "Name": "SecurityPolicyDsc",
+          "Uri": "https://devopsgallerystorage.blob.core.windows.net:443/packages/securitypolicydsc.2.4.0.nupkg"
+        },
+        {
+          "Name": "SqlServerDsc",
+          "Uri": "https://devopsgallerystorage.blob.core.windows.net:443/packages/sqlserverdsc.12.1.0.nupkg"
+        },
+        {
+          "Name": "WindowsDefenderDsc",
+          "Uri": "https://devopsgallerystorage.blob.core.windows.net:443/packages/windowsdefenderdsc.1.0.0.nupkg"
+        },
+        {
+          "Name": "xDnsServer",
+          "Uri": "https://devopsgallerystorage.blob.core.windows.net:443/packages/xdnsserver.1.11.0.nupkg"
+        },
+        {
+          "Name": "xWebAdministration",
+          "Uri": "https://devopsgallerystorage.blob.core.windows.net:443/packages/xwebadministration.2.5.0.nupkg"
+        }
+      ]
+    },
+    "Level0": {
+      "Modules": [
+        {
+          "Name": "PowerSTIG",
+          "Uri": "https://devopsgallerystorage.blob.core.windows.net:443/packages/powerstig.3.3.0.nupkg"
+        }
+      ]
+    }
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-01-01",
+      "name": "nestedTemplate",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "incremental",
+        "templateLink": {
+          "uri": "[variables('templatelink')]",
+          "contentVersion": "1.0"
+        },
+        "parameters": {
+          "accountName": {
+            "value": "[parameters('Automation Account Name')]"
+          },
+          "accountLocation": {
+            "value": "[parameters('Automation Account Location')]"
+          },
+          "Level1": {
+            "value": "[variables('Level1')]"
+          },
+          "Level0": {
+            "value": "[variables('Level0')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}
